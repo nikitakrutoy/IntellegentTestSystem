@@ -14,6 +14,9 @@ import os
 import dj_database_url
 import environ
 
+env = environ.Env(DEBUG=(bool, False))
+environ.Env.read_env()
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -23,12 +26,12 @@ PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 # See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'r+oe5-z-5$73dd3kqef2^n_3_c$qe(1$v#3$hyd6r1%kia%00$'
+SECRET_KEY = env.str('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env.bool('DEBUG')
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=[])
 
 
 # Application definition
@@ -121,7 +124,7 @@ USE_L10N = True
 USE_TZ = True
 
 #Django Telegram Bot settings
-
+TELEGRAM_BOT_TOKEN = env.str("BOT_TOKEN", 'test')
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
