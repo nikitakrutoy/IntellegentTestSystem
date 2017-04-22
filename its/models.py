@@ -15,13 +15,6 @@ class User(models.Model):
     class Meta:
         db_table = "user"
 
-
-class Session(models.Model):
-    session_id = models.IntegerField(primary_key=True)
-    questions = models.ManyToManyField(Question)
-    class Meta:
-        db_table = "session"
-
 class Question(models.Model):
     objects= QuestionManager();
     question_id = models.IntegerField(primary_key=True)
@@ -32,6 +25,12 @@ class Question(models.Model):
     class Meta:
         db_table = 'question'
         ordering = ['-added_at']
+        
+class Session(models.Model):
+    session_id = models.IntegerField(primary_key=True)
+    questions = models.ManyToManyField(Question)
+    class Meta:
+        db_table = "session"
 
 class Answer(models.Model):
     text = models.TextField()
