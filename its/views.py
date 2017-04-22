@@ -6,7 +6,7 @@ import telepot
 from django.conf import settings
 from django.http import HttpResponseForbidden, HttpResponseBadRequest, JsonResponse
 from django.views.decorators.csrf import ensure_csrf_cookie
-
+from .models import Question
 from django.views.decorators.csrf import csrf_exempt
 TelegramBot = telepot.Bot(settings.TELEGRAM_BOT_TOKEN)
 
@@ -21,6 +21,7 @@ def reply(request, bot_token):
     logger.info(raw)
     
     payload = json.loads(raw)
-    chat_id = payload['message']['chat']['id']
-    TelegramBot.sendMessage(chat_id, "Hello!")
+    chat_id = payload['message']['chat']['id'] 
+    TelegramBot.sendMessage(chat_id, payload)
+    TelegramBot.sendMessage(chat_id, Question.objects.get(question_id = 0).text)
     return JsonResponse({}, status=200)
