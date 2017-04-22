@@ -24,18 +24,17 @@ class Question(models.Model):
     author = models.ForeignKey(User)
     class Meta:
         db_table = 'question'
-        ordering = ['-added_at']
-        
+
 class Session(models.Model):
-    session_id = models.IntegerField(primary_key=True)
+    id = models.IntegerField(primary_key=True)
     questions = models.ManyToManyField(Question)
+    top_border = models.IntegerField(default=0)
+    bottom_border = models.IntegerField(default=0)
     class Meta:
         db_table = "session"
 
 class Answer(models.Model):
     text = models.TextField()
-    added_at = models.DateTimeField(blank=True, auto_now_add=True)
     question = models.ForeignKey(Question)
-    author = models.ForeignKey(User)
     class Meta:
         db_table = 'answer'
