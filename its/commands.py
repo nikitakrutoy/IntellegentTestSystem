@@ -2,7 +2,7 @@ from .models import Session, Question
 from django.conf import settings
 import telepot
 from collections import deque
-
+from random import shuffle
 TelegramBot = telepot.Bot(settings.TELEGRAM_BOT_TOKEN)
 
 def handler(payload):
@@ -30,13 +30,15 @@ def callback_handler(msg):
 
 
 def test_session(chat_id):
-    if atributes[0] == "test":
-        session= Session.objects.get(id = 0)
-        top = session.top_border
-        bottom = session.bottom_border
-        questions = session.question
-        queue = deque(questions)
-        TelegramBot.sendMessage(chat_id, queue)
+    session= Session.objects.get(id = 1)
+    top = session.top_border
+    bottom = session.bottom_border
+    questions = session.questions
+
+    queue = deque(questions.all())
+    shuffle(queue)
+    for question in queue:
+        TelegramBot.sendMessage(chat_id, question.text)
 
 
 def question(q):
