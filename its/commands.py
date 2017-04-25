@@ -1,5 +1,8 @@
 from .models import Session, Question
+from django.conf import settings
 import telepot
+
+TelegramBot = telepot.Bot(settings.TELEGRAM_BOT_TOKEN)
 
 def handler(payload):
     if "callback_query" in payload:
@@ -10,27 +13,19 @@ def handler(payload):
 
 
 def message_handler(msg):
-    content_type, chat_type, chat_id = telepot.glance(msg)
-    TelegramBot.sendMessage(chat_id, telepot.glance(msg))
+    chat_id = msg['chat']['id']
+    TelegramBot.sendMessage(chat_id, msg)
 
 def callback_handler(msg):
-    pass
+    chat_id = msg['callback_query']['chat']['id']
+    TelegramBot.sendMessage(chat_id, msg)
 
-def start(atributes):
-    TelegramBot.sendMessage(chat_id,
-    "Вы запустили тестового бота.\n Пожалуйста не ломайте его,
-    Я долго над ним стралася")
 
 
 def session(atributes):
     if atributes[0] == "test":
         session_id = Session.objects.get(id = 0)
         questions = session_id.question
-
-
-    else:
-        TelegramBot.sendMessage(chat_id,
-        "Сессии пока работаю только в тетстовом режиме")
     pass
 
 

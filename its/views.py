@@ -8,10 +8,8 @@ from django.conf import settings
 from django.http import HttpResponseForbidden, HttpResponseBadRequest, JsonResponse
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.csrf import csrf_exempt
-import .commands
+from .commands import handler
 
-
-TelegramBot = telepot.Bot(settings.TELEGRAM_BOT_TOKEN)
 logger = logging.getLogger('telegram.bot')
 
 @csrf_exempt
