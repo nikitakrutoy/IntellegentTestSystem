@@ -16,11 +16,11 @@ class User(models.Model):
         db_table = "user"
 
 class Question(models.Model):
-    objects= QuestionManager();
     question_id = models.IntegerField(primary_key=True)
     title = models.CharField(max_length=255)
     text = models.TextField()
     complexity = models.IntegerField(default = 0)
+    answers = models.CharField(max_length=255, choices=[], null=True)
     author = models.ForeignKey(User)
     class Meta:
         db_table = 'question'
