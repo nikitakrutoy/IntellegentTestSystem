@@ -10,10 +10,7 @@ class Tags(models.Model):
     pass
 
 class User(models.Model):
-    user_id = models.IntegerField(primary_key=True)
-    telegram_id = models.TextField();
-    class Meta:
-        db_table = "user"
+    pass
 
 class Question(models.Model):
     question_id = models.IntegerField(primary_key=True)
@@ -21,7 +18,7 @@ class Question(models.Model):
     text = models.TextField()
     complexity = models.IntegerField(default = 0)
     answers = models.CharField(max_length=255, choices=[], null=True)
-    author = models.ForeignKey(User)
+    # author = models.ForeignKey(User)
     class Meta:
         db_table = 'question'
 
@@ -33,7 +30,17 @@ class Session(models.Model):
     class Meta:
         db_table = "session"
 
-class Answer(models.Model):
+
+class User(models.Model):
+    user_id = models.IntegerField(primary_key=True)
+    telegram_id = models.TextField();
+    current_session = models.ForeignKey(Session, null=True)
+    current_session_questions = models.TextField(null=True)
+    class Meta:
+        db_table = "user"
+
+
+class Answer(models.Model):?
     text = models.TextField()
     question = models.ForeignKey(Question)
     class Meta:

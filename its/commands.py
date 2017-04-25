@@ -1,4 +1,4 @@
-from .models import Session, Question
+from .models import Session, Question, User
 from django.conf import settings
 import telepot
 import json
@@ -29,9 +29,13 @@ def callback_handler(msg):
     TelegramBot.answerCallbackQuery(callback_query_id = msg['callback_query']['id'])
     chat_id = msg['callback_query']['chat']['id']
     data = msg['callback_query']['data']
-    queue = json.loads(data)
+    user = User.objects.get(user_id = 0)
+    queue = user.current_session_questions
+    currnet_question = queue.pop()
+    user.current_session_questions = ','.join(queue);
+    user.save()
     if (len(queue)!=0):
-        ask_question(chat_id, queue)
+        ask_question(chat_id)
     else:
         TelegramBot.sendMessage(chat_id, "Тест закончен")
 
@@ -39,23 +43,30 @@ def callback_handler(msg):
 
 def test_session(chat_id):
     session= Session.objects.get(id = 1)
+    user = User.objects.get(user_id = 0)
+    user.current_session = session;
     top = session.top_border
     bottom = session.bottom_border
-    questions = session.questions
-
-    queue = deque(questions.all())
+    queue = []
+    questions_objs = session.questions.all()
+    for obj in questions_objs:
+        queue.append(str(obj.question_id))
     shuffle(queue)
-    ask_question(queue)
+    user.current_session_questions = ','.join(queue);
+    user.save()
+    ask_question(chat_id)
 
 
-def ask_question(chat_id, queue):
-    question = queue.popleft()
-    answers = question.asnwers.split(", ")
+def ask_question(chat_id):
+    user = User.objects.get(user_id = 0)
+    queue = user.current_session_questions.split(',')
+    question = Question.objects.get(question_id = queue[len(queue)-1])
     text = question.text
-    data = json.dump(queue, skipkeys = True)
-    if not answers:
+    # data = json.dump(queue, skipkeys = True)
+    if question.answer:
+        answers = question.asnwers.split(", ")
         keyboard = []
-        for asnwer in answers:
-            keyboard.append(InlineKeyboardButton(text = answer, data = data))
+        for answer in answers:
+            keyboard.append([InlineKeyboardButton(text = answer, callback_data = answer)])
         keyboard = InlineKeyboardMarkup(inline_keyboard = keyboard)
     TelegramBot.sendMessage(chat_id, text, reply_markup=keyboard)
