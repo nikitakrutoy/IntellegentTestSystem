@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from .models import Session, Question, User
 from django.conf import settings
 import telepot
@@ -15,22 +16,39 @@ def handler(payload):
         message_handler(message)
 
 
-def message_handler(msg):
-    chat_id = msg['chat']['id']
-    TelegramBot.sendMessage(chat_id, msg)
-    if "entities" in msg:
-        entities = msg["entities"]
-        if entities[0]["type"] == "bot_command":
-            if msg["text"] == "/session":
-                test_session(chat_id)
+def message_handler(msg):	
+	user = User.objects.get(user_id = 0)	
+	if len(user.current_session_questions) > 0:
+		text_answer_handler(msg)
+	else:
+		chat_id = msg['chat']['id']
+		TelegramBot.sendMessage(chat_id, msg)
+		if "entities" in msg:
+			entities = msg["entities"]
+			if entities[0]["type"] == "bot_command":
+				if msg["text"] == "/session":
+					test_session(chat_id)
 
+
+def text_answer_handler(msg):
+	chat_id = msg['chat']['id']
+	user = User.objects.get(user_id = 0)
+	queue = user.current_session_questions.split(',')
+	currnet_question = queue.pop()
+	user.current_session_questions = ','.join(queue);
+	user.save()
+	if (len(queue)!=0):
+		ask_question(chat_id)
+	else:
+		TelegramBot.sendMessage(chat_id, "Тест закончен")
+	
 
 def callback_handler(msg):
     TelegramBot.answerCallbackQuery(callback_query_id = msg['callback_query']['id'])
-    chat_id = msg['callback_query']['chat']['id']
+    chat_id = msg['callback_query']['message']['chat']['id']
     data = msg['callback_query']['data']
     user = User.objects.get(user_id = 0)
-    queue = user.current_session_questions
+    queue = user.current_session_questions.split(',')
     currnet_question = queue.pop()
     user.current_session_questions = ','.join(queue);
     user.save()
@@ -38,7 +56,6 @@ def callback_handler(msg):
         ask_question(chat_id)
     else:
         TelegramBot.sendMessage(chat_id, "Тест закончен")
-
 
 
 def test_session(chat_id):
@@ -62,11 +79,13 @@ def ask_question(chat_id):
     queue = user.current_session_questions.split(',')
     question = Question.objects.get(question_id = queue[len(queue)-1])
     text = question.text
-    # data = json.dump(queue, skipkeys = True)
-    if question.answer:
-        answers = question.asnwers.split(", ")
+    if question.answers:
+        answers = question.answers.split(", ")
         keyboard = []
         for answer in answers:
             keyboard.append([InlineKeyboardButton(text = answer, callback_data = answer)])
         keyboard = InlineKeyboardMarkup(inline_keyboard = keyboard)
-    TelegramBot.sendMessage(chat_id, text, reply_markup=keyboard)
+        TelegramBot.sendMessage(chat_id, text, reply_markup=keyboard)
+    else:
+        TelegramBot.sendMessage(chat_id, text)
+

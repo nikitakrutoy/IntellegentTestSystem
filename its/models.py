@@ -9,8 +9,6 @@ class QuestionManager(models.Manager):
 class Tags(models.Model):
     pass
 
-class User(models.Model):
-    pass
 
 class Question(models.Model):
     question_id = models.IntegerField(primary_key=True)
@@ -40,7 +38,7 @@ class User(models.Model):
         db_table = "user"
 
 
-class Answer(models.Model):?
+class Answer(models.Model):
     text = models.TextField()
     question = models.ForeignKey(Question)
     class Meta:
