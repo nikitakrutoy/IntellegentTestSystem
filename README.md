@@ -1,4 +1,4 @@
-# Intellegent test system
+# Intellegent Test System
 Test system that can adapt to users by giving questions of varying complexity depending on the answers.  
 
 ## Desciption
